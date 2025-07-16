@@ -73,6 +73,12 @@ jobs:
             setup: rustup target add aarch64-unknown-linux-musl
             cross-compile: true
 
+          - runner: ubuntu-latest
+            target: arm-unknown-linux-gnueabihf
+            command: test # This is a cross specific command. Do not change
+            setup: rustup target add arm-unknown-linux-gnueabihf
+            cross-compile: true
+
     timeout-minutes: 30
     runs-on: ${{ matrix.environments.runner }}
     steps:
