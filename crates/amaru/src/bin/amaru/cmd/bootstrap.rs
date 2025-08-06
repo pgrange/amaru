@@ -19,7 +19,7 @@ use super::{
 };
 use crate::cmd::DEFAULT_NETWORK;
 use amaru::snapshots_dir;
-use amaru_kernel::{default_chain_dir, default_ledger_dir, network::NetworkName, parse_point};
+use amaru_kernel::{default_chain_dir, default_ledger_dir, network::NetworkName, parse_point, EraHistory};
 use async_compression::tokio::bufread::GzipDecoder;
 use clap::{arg, Parser};
 use futures_util::TryStreamExt;
@@ -96,7 +96,7 @@ pub async fn run(args: Args) -> Result<(), Box<dyn Error>> {
     );
 
     let network = args.network;
-    let era_history = network.into();
+    let era_history: &EraHistory = network.into();
 
     let ledger_dir = args
         .ledger_dir
@@ -111,12 +111,15 @@ pub async fn run(args: Args) -> Result<(), Box<dyn Error>> {
     let snapshots_file: PathBuf = network_dir.join("snapshots.json");
     let snapshots_dir = PathBuf::from(snapshots_dir(network));
 
-    download_snapshots(&snapshots_file, &snapshots_dir).await?;
+    // download_snapshots(&snapshots_file, &snapshots_dir).await?;
 
-    import_all_from_directory(&ledger_dir, era_history, &snapshots_dir).await?;
+    //Ce truc devrai suffir à démarrer avec une chainDB
+    // import_all_from_directory(&ledger_dir, era_history, &snapshots_dir).await?;
 
-    import_nonces_for_network(era_history, &network_dir, &chain_dir).await?;
+    //Agit sur la chain
+    // import_nonces_for_network(era_history, &network_dir, &chain_dir).await?;
 
+    //Agit sur la chain
     import_headers_for_network(network, &args.peer_address, &network_dir, &chain_dir).await?;
 
     Ok(())

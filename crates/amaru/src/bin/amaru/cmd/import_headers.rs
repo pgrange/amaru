@@ -31,6 +31,8 @@ use std::{
 };
 use tokio::{sync::Mutex, time::timeout};
 use tracing::info;
+use std::fs::File;
+use std::io::Write;
 
 #[derive(Debug, Parser)]
 pub struct Args {
@@ -96,7 +98,7 @@ pub async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
     .await
 }
 
-pub(crate) async fn import_headers(
+    pub(crate) async fn import_headers(
     peer_address: &str,
     network_name: NetworkName,
     chain_db_dir: &PathBuf,
@@ -195,6 +197,11 @@ fn handle_response(
         NextResponse::RollForward(content, tip) => {
             let header: Header = from_cbor(&content.cbor).unwrap();
             let hash = header.hash();
+            let slot = header.slot();
+
+            let filename = format!("chain.{}.{}.cbor", slot, hex::encode(hash));
+            let mut file = File::create(&filename).map_err(|_| WorkerError::Panic)?;
+            file.write_all(&content.cbor).map_err(|_| WorkerError::Panic)?;
 
             db.store_header(&hash, &header)
                 .map_err(|_| WorkerError::Panic)?;
