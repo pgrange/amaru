@@ -33,6 +33,7 @@ use tokio::{sync::Mutex, time::timeout};
 use tracing::info;
 use std::fs::File;
 use std::io::Write;
+use std::io::Read;
 
 #[derive(Debug, Parser)]
 pub struct Args {
@@ -203,7 +204,13 @@ fn handle_response(
             let mut file = File::create(&filename).map_err(|_| WorkerError::Panic)?;
             file.write_all(&content.cbor).map_err(|_| WorkerError::Panic)?;
 
-            db.store_header(&hash, &header)
+            // Read header from the just-written content.cbor file
+            let mut file = File::open(&filename).map_err(|_| WorkerError::Panic)?;
+            let mut cbor_data = Vec::new();
+            file.read_to_end(&mut cbor_data).map_err(|_| WorkerError::Panic)?;
+            let header_from_file: Header = from_cbor(&cbor_data).unwrap();
+
+            db.store_header(&hash, &header_from_file)
                 .map_err(|_| WorkerError::Panic)?;
 
             *count += 1;

@@ -114,10 +114,10 @@ pub async fn run(args: Args) -> Result<(), Box<dyn Error>> {
     // download_snapshots(&snapshots_file, &snapshots_dir).await?;
 
     //Ce truc devrai suffir à démarrer avec une chainDB
-    // import_all_from_directory(&ledger_dir, era_history, &snapshots_dir).await?;
+    import_all_from_directory(&ledger_dir, era_history, &snapshots_dir).await?;
 
     //Agit sur la chain
-    // import_nonces_for_network(era_history, &network_dir, &chain_dir).await?;
+    import_nonces_for_network(era_history, &network_dir, &chain_dir).await?;
 
     //Agit sur la chain
     import_headers_for_network(network, &args.peer_address, &network_dir, &chain_dir).await?;
