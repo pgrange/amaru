@@ -52,6 +52,7 @@ fn db(network: NetworkName, epoch: Epoch) -> Arc<impl Snapshot + Send + Sync> {
             Arc::new(
                 RocksDBHistoricalStores::for_epoch_with(
                     &PathBuf::from(format!("../../{}", default_ledger_dir(network))),
+                    amaru_stores::rocksdb::RocksDBMaxOpenFiles::NoLimit,
                     epoch,
                 )
                 .unwrap_or_else(|err| {
